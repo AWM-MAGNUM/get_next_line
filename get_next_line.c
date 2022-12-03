@@ -1,56 +1,58 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bel-kase <bel-kase@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/02 15:45:21 by bel-kase          #+#    #+#             */
+/*   Updated: 2022/12/03 19:28:12 by bel-kase         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 #include <unistd.h>
 #include <fcntl.h>
 
-char	*THE_READER(int fd,char *unreal)
+char	*ft_the_reader(int fd, char *unreal)
 {
-	char *buff;
-	int		count_bytes;
+	char		*buff;
+	int			count_bytes;
 
-buff = malloc((BUFFER_SIZE + 1) * sizeof(char)); /*Nous avon allocer avec le size de BUFFER SIZE que nous avons donner dans le main
- et multiplier par combien de charactere  */
-if (!buff)
-	return (NULL);
-
-count_bytes = 1; /* debugger variable si counteur de bytes a envoyer -1 ca veut dire que READ() a Failed
-si le c_b a envoyer le 0 ca veut dire que n'a rien trouver de liser ou nous avons donner un BUFFER_SIZE plus
-grans que le contenu qui faut lire 
-et dans le cas normale il faut envoyer une valeur inferieur de 0*/
-while (ft_strchr(unreal,'\n') == NULL && count_bytes != 0)
-{
-	count_bytes = read(fd,buff,BUFFER_SIZE); 
-	if (count_bytes == -1)
-	{
-		free(buff); /* nous avons free le buff car nous avons allocer il est remplie avec un Garbage-value*/
+buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buff)
 		return (NULL);
-	}
+count_bytes = 1;
+	while (ft_strchr(unreal, '\n') == NULL && count_bytes != 0)
+	{
+		count_bytes = read(fd, buff, BUFFER_SIZE);
+		if (count_bytes == -1)
+		{
+			free(buff);
+			return (NULL);
+		}
 	buff[count_bytes] = '\0';
-	unreal = ft_strjoin(unreal,buff); /* nous avons joyner car la valeur de static variable et la nouvelle valeur que nous avons lu  */
+		unreal = ft_strjoin(unreal, buff);
+	}
+	free(buff);
+	return (unreal);
 }
-free(buff);
-return (unreal);
-}
-/*j' ai cree cette FUNCTION pour que j'appel la function READ de systeme
- qu'elle Ouvre un fichier descriptor pour me le lire avec un size_buffer specifier
-  et elle stock dans le BUFF et le BUFF nous le stockons dans static variable  */
 
-char *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-	char	*line;
-	static	char	*MINI_LINE; /* le role de statique vaiable est de stocker le contenue envoyer par BUff
-	 jusqu'a que la ligne printer et la ligne printer se ecraser du BUFF */
+	char		*line;
+	static char	*mini_line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
-	MINI_LINE = THE_READER(fd,MINI_LINE); /* nous remplisser le static variable (MINI_LINE)
-	 que READ il a lu avec le BUFFER_SIZE que nous avons donne  et il a stocker a le variable unreal et on a renvoier unreal pour 
-	 que le static char (mini_line prend la valeur de unreal)*/
-	if ( MINI_LINE == NULL)
+	mini_line = ft_the_reader(fd, mini_line);
+	if (mini_line == NULL)
 		return (NULL);
-	line = EXTRACTEUR_THE_LINE(MINI_LINE); 
-	MINI_LINE = UPDATE_42(MINI_LINE);
+	line = ft_extracteur_the_line(mini_line);
+	mini_line = ft_update_42(mini_line);
 	return (line);
 }
+
 /*int	main(void)
 {
 	char	*line;
